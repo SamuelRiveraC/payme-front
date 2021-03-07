@@ -1,0 +1,194 @@
+
+.ct-loader {
+  height: 100%;
+  position: fixed;
+  width: 100%;
+  z-index: 999999;
+  top: 0;
+  left: 0;
+  -webkit-transition: all 300ms linear 0ms;
+  -khtml-transition: all 300ms linear 0ms;
+  -moz-transition: all 300ms linear 0ms;
+  -ms-transition: all 300ms linear 0ms;
+  -o-transition: all 300ms linear 0ms;
+  transition: all 300ms linear 0ms;
+}
+.ct-loader .loading-spin {
+  display: block;
+  height: 64px;
+  margin: -32px auto 0;
+  position: relative;
+  top: 50%;
+}
+.ct-loader .loading-spin .spinner {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  -webkit-animation: spin-rotate-all 1s linear infinite;
+  animation: spin-rotate-all 1s linear infinite;
+}
+.ct-loader .loading-spin .spinner .right-side, .ct-loader .loading-spin .spinner .left-side {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  overflow: hidden;
+  -webkit-animation: spin-fade-in-first 1.2s linear infinite alternate;
+  animation: spin-fade-in-first 1.2s linear infinite alternate;
+}
+.ct-loader .loading-spin .spinner .left-side {
+  left: 0;
+}
+.ct-loader .loading-spin .spinner .right-side {
+  right: 0;
+}
+.ct-loader .loading-spin .spinner.color-2 .right-side, .ct-loader .loading-spin .spinner.color-2 .left-side {
+  -webkit-animation: spin-fade-in-second 1.2s linear infinite alternate;
+  animation: spin-fade-in-second 1.2s linear infinite alternate;
+}
+.ct-loader .loading-spin .spinner .bar {
+  width: 100%;
+  height: 100%;
+  -webkit-border-radius: 200px 0 0 200px;
+  -khtml-border-radius: 200px 0 0 200px;
+  -moz-border-radius: 200px 0 0 200px;
+  -ms-border-radius: 200px 0 0 200px;
+  -o-border-radius: 200px 0 0 200px;
+  border-radius: 200px 0 0 200px;
+  border: 12px solid #EDF4FC;
+  position: relative;
+}
+.ct-loader .loading-spin .spinner .bar:after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  display: block;
+  background: #EDF4FC;
+  position: absolute;
+  -webkit-border-radius: 12px;
+  -khtml-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -ms-border-radius: 12px;
+  -o-border-radius: 12px;
+  border-radius: 12px;
+}
+.ct-loader .loading-spin .spinner .right-side .bar {
+  -webkit-border-radius: 0 200px 200px 0;
+  -khtml-border-radius: 0 200px 200px 0;
+  -moz-border-radius: 0 200px 200px 0;
+  -ms-border-radius: 0 200px 200px 0;
+  -o-border-radius: 0 200px 200px 0;
+  border-radius: 0 200px 200px 0;
+  border-left: none;
+  -webkit-transform: rotate(-10deg);
+  -webkit-transform-origin: left center;
+  transform: rotate(-10deg);
+  transform-origin: left center;
+  -webkit-animation: spin-rotate-right 0.75s linear infinite alternate;
+  animation: spin-rotate-right 0.75s linear infinite alternate;
+}
+.ct-loader .loading-spin .spinner .right-side .bar:after {
+  bottom: -12px;
+  left: -3px;
+}
+.ct-loader .loading-spin .spinner .left-side .bar {
+  border-right: none;
+  -webkit-transform: rotate(10deg);
+  transform: rotate(10deg);
+  -webkit-transform-origin: right center;
+  transform-origin: right center;
+  -webkit-animation: spin-rotate-left 0.75s linear infinite alternate;
+  animation: spin-rotate-left 0.75s linear infinite alternate;
+}
+.ct-loader .loading-spin .spinner .left-side .bar:after {
+  bottom: -12px;
+  right: -3px;
+}
+
+
+@keyframes spin-rotate-left {
+  to {
+    transform: rotate(30deg);
+  }
+  from {
+    transform: rotate(175deg);
+  }
+}
+@-webkit-keyframes spin-rotate-left {
+  to {
+    transform: rotate(30deg);
+  }
+  from {
+    transform: rotate(175deg);
+  }
+}
+@keyframes spin-rotate-right {
+  from {
+    transform: rotate(-175deg);
+  }
+  to {
+    transform: rotate(-30deg);
+  }
+}
+@-webkit-keyframes spin-rotate-right {
+  from {
+    transform: rotate(-175deg);
+  }
+  to {
+    transform: rotate(-30deg);
+  }
+}
+@keyframes spin-rotate-all {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@-webkit-keyframes spin-rotate-all {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes spin-fade-in-first {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes spin-fade-in-first {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes spin-fade-in-second {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes spin-fade-in-second {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
