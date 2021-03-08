@@ -14,7 +14,7 @@ export default function AddAccount() {
   const [step, setStep] = useState(0);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [provider, setProvider] = useState("")
+  const [provider, setProvider] = useState("payme")
 
   const createAccount = () => {
     setStep(1) 
@@ -80,7 +80,7 @@ export default function AddAccount() {
             <div className="col-12 mobile_col">
               <label className="form-label" >Select Bank</label>
               <select className="form-control" value={provider} onChange={(e)=>setProvider(e.target.value)}>
-                <option value="payme"> PayMe Test Bank </option>
+                <option value="payme" selected> PayMe Test Bank </option>
                 <option value="deutschebank"> Deutsche Bank </option>
                 <option value="rabobank"> Rabobank </option>
                 <option value="neonomics" > Neonomics banking aggregator </option>
