@@ -148,9 +148,11 @@ export default function Account() {
           </div>
   
           <div className="col-12 mobile_col text-center">
+            {/*
             <button className="btn btn-primary w-100 mb-3" onClick={()=>updateAccount({expires_at:true})}>
               Renew account 
             </button>
+            */}
             <button className="btn btn-outline-primary w-100 mb-3" onClick={()=>deleteAccount()}>
               Delete account 
             </button>

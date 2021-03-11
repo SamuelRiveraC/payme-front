@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Qs from "qs"
 import axios from 'axios';
 import Header from '../components/Header';
 import { useHistory, useParams, useLocation } from "react-router-dom"
@@ -30,79 +31,178 @@ export default function AddAccount() {
     });
   }
 
-  
+  const getAccounts = () => {
+    let user = JSON.parse(localStorage.getItem('user'))
+                
+    if (user.keys?.deutschebank) {
+        let access_token = user?.keys?.deutschebank?.access_token
+
+        if  (!access_token) {
+          setError("No Token");
+          setStep(-1);
+        }
+
+        axios.get( "https://simulator-api.db.com/gw/dbapi/v1/cashAccounts",
+          {headers: { Authorization: `Bearer ${access_token}` }} //response.data.access_token
+        ).then( (response) => {
+          setAccounts(response.data)
+
+          axios.post( process.env.REACT_APP_API_URL+"bank_accounts/", {
+            bank:"deutschebank", bank_accounts: response.data,
+          },
+            {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
+          ).then( (response) => {
+            setSuccess("Deutschebank bank accounts added successfully"); setStep(2)
+          }).catch(error => {setError(error.message); setStep(0)});
+          
+        })
+        .catch((error) => {
+          setError(error.message)
+          if (error.response.status === 401) {
+            delete user.keys.deutschebank
+            localStorage.setItem('user', JSON.stringify(user))
+          }
+          setStep(-1)
+        });
+    }
+
+
+    if (user.keys?.rabobank) {
+        let access_token = user?.keys?.rabobank?.access_token
+
+        if  (!access_token) {
+          setError("No Token");
+          setStep(-1);
+        }
+        const { v4: uuidv4 } = require('uuid');
+
+        axios.get( "https://api-sandbox.rabobank.nl/openapi/sandbox/payments/account-information/ais/accounts",
+          {headers: {
+              Authorization: `Bearer ${access_token}`, 
+              accept: `application/json`, 
+              date: `${new Date().toUTCString()}`, 
+
+              //digest: `sha-512=${btoa(BinarySHA512(""))}`,
+              
+
+              "psu-ip-address": ``, //There is no limit in amount of calls
+              
+              //AIS = date+digest+x-request-id
+              signature: ``, //For description and examples check the documentation section.
+
+
+              "tpp-signature-certificate": process.env.REACT_APP_rabobank_signing_cer,
+              "x-ibm-client-id": process.env.REACT_APP_rabobank_client, 
+              "x-request-id": uuidv4(), // CREATE UUID ¿just because? 
+          } } //response.data.access_token
+        ).then( (response) => {
+          setAccounts(response.data)
+
+          /*
+          //PIS = date+digest+x-request-id+tpp-redirect-uri (mandatory for ‘HTTP POST request)
+
+          --header 'digest: REPLACE_THIS_VALUE' \
+          --header 'psu-ip-address: REPLACE_THIS_VALUE' \
+          --header 'signature: REPLACE_THIS_VALUE' \
+
+          axios.post( process.env.REACT_APP_API_URL+"bank_accounts/", {
+            bank:"rabobank", bank_accounts: response.data,
+          },
+            {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
+          ).then( (response) => {
+            setSuccess("Rabobank bank accounts added successfully"); setStep(2)
+          }).catch(error => {setError(error.message); setStep(0)});
+          */
+        })
+        .catch((error) => {
+          setError(error.message)
+          if (error.response.status === 401) {
+            delete user.keys.rabobank
+            localStorage.setItem('user', JSON.stringify(user))
+          }
+          setStep(-1)
+        });
+    }
+
+
+    // history.replace("/accounts")
+  }
 
   const useQuery = () => {
     return new URLSearchParams(useLocation().search);
   }
+
+
   let query = useQuery();
-  const getAccounts = () => {
-    setStep(1) 
+  const getAuth = () => {
+    // IF HAS TOKENS
+    let user = JSON.parse(localStorage.getItem('user'))
 
-    switch (bank) {
-      case "deutschebank":
-
-        axios.post( "https://simulator-api.db.com/gw/oidc/token/", {
-          grant_type: 'authorization_code',
-          code: query.get("code"),
-          // redirect_uri: process.env.REACT_APP_APP_URL+"add-account/deutschebank/"
-        }, {
-          headers: { Authorization: `Basic ${btoa(process.env.REACT_APP_deutschebank_client+":"+process.env.REACT_APP_deutschebank_secret)}` }
-        } ).then( (response) => {
-          console.log(response)
-          // setSuccess("Bank Account added successfully"); setStep(2)
-        })
-        .catch((error) => {
-          setError(error.message)
-          setStep(-1)
-        });
-
-        /*
-
-        axios.get( "https://simulator-api.db.com:443/gw/dbapi/banking/cashAccounts/v2",
-          {headers: { Authorization: `Bearer ${query.get("code")}` }}
-        ).then( (response) => {
-          console.log(response)
-          // setSuccess("Bank Account added successfully"); setStep(2)
-        })
-        .catch((error) => {
-          setError(error.message)
-          setStep(-1)
-        });
-        */
-        break;
-
-      case "rabobank":
-        axios.post( "https://api-sandbox.rabobank.nl/openapi/sandbox/oauth2/token",{
-          grant_type: 'authorization_code',
-          code: query.get("code"),
-          redirect_uri: process.env.REACT_APP_APP_URL+"add-account/rabobank"
-        }, { 
-          headers: { 
-            accept: 'application/json',
-            'content-type': 'application/x-www-form-urlencoded',
-            Authorization: `Basic ${btoa(process.env.REACT_APP_rabobank_client+":"+process.env.REACT_APP_rabobank_secret)}`,
-          }
-        }).then( (response) => {
-          console.log(response)
-          // setSuccess("Bank Account added successfully"); setStep(2)
-        })
-        .catch((error) => {
-          setError(error.message)
-          setStep(-1)
-        });
-        break;
-
-      case "neonomics":
-        break;
-
-      default:
-        break;
+    if (user?.keys && user?.keys === {}) {
+      console.log(user?.keys, user?.keys !== {}, user?.keys && user?.keys === {})
+      getAccounts()
     }
-    setStep(0) 
+    else if (query.get("code")) {
+      setTimeout ( () => {
+        switch (bank) {
+          case "deutschebank":
+              axios.post( process.env.REACT_APP_API_URL+"oauth",{ code: query.get("code"), bank: "deutschebank" })
+              .then( (response) => {
+                let user = JSON.parse(localStorage.getItem('user'))
+                if (!user?.keys)
+                  user.keys = {}
+
+                if (response.data.data) {
+                  user.keys.deutschebank = response.data.data
+                  localStorage.setItem('user', JSON.stringify(user))
+                  console.log(user)
+                  getAccounts()
+                } else {
+                  throw new Error("Invalid Authorization Token");
+                }
+              })
+              .catch((error) => {
+                setError("Invalid Authorization Token")
+                setStep(-1)
+              });
+            break;
+    
+          case "rabobank":
+
+            axios.post( process.env.REACT_APP_API_URL+"oauth",{ code: query.get("code"), bank: "rabobank" })
+              .then( (response) => {
+                let user = JSON.parse(localStorage.getItem('user'))
+                if (!user?.keys)
+                  user.keys = {}
+                if (response.data.data) {
+                  user.keys.rabobank = response.data.data
+                  localStorage.setItem('user', JSON.stringify(user))
+                  console.log(user)
+                  getAccounts()
+                } else {
+                  throw new Error("Invalid Authorization Token");
+                }
+              })
+              .catch((error) => {
+                setError("Invalid Authorization Token")
+                setStep(-1)
+              });
+            break;
+    
+          case "neonomics":
+            break;
+    
+          default:
+            history.replace("/accounts")
+            break;
+        }
+      }, 1000 )
+    }
   }
 
-  useEffect(() => getAccounts(), [])
+
+
+  useEffect(() => getAuth(), [])
 
   return (
     <VelocityTransitionGroup enter={{animation: "fadeIn", duration:500,delay:600}} leave={{animation: "slideUp",duration:500}} >
@@ -113,7 +213,7 @@ export default function AddAccount() {
             <Header back> Add Account. </Header>
 
             <div className="col-12 mobile_col">
-
+              {JSON.stringify(accounts)}
               
             </div>
 

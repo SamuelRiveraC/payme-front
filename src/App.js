@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Switch, useLocation } from 'react-router-dom';
 import { useHistory } from "react-router-dom"
 
+import Qs from 'qs';
 import axios from 'axios';
 
 import Onboarding from './pages/Onboarding';
@@ -71,8 +72,31 @@ function App() {
           type: "bearer",
           token: getUser()?.token,
           user: response.data,
-          date: Date.now()
+          date: Date.now(),
+          keys: getUser()?.keys
         }
+
+        /*
+          THESE ARE REFRESHED FROM THE BACKEND (sigh)
+
+          for each userData.keys get axios and change data !async! 
+          if (userData.keys?.deutschebank) {
+            axios.post( "https://simulator-api.db.com/gw/oidc/token", Qs.stringify({
+              grant_type:"refresh_token", refresh_token: userData.keys.deutschebank.refresh_token
+            }),
+            {headers: { Authorization: `Bearer ${userData.keys.deutschebank.access_token}`, 
+              "Content-Type": "application/x-www-form-urlencoded" }} 
+            ).then( (response) => { userData.keys.deutschebank = response.data })
+          }
+          if (userData.keys?.rabobank) {
+            axios.get( "https://simulator-api.db.com/gw/dbapi/v1/cashAccounts",
+              {headers: { Authorization: `Bearer ${userData.keys.rabobank.access_token}` }} 
+            ).then( (response) => { userData.keys.rabobank = response.data })
+          }
+          
+          TAKE CARE BELOW MAY WORK BEFORE EDITED USER DATA AND SAY ITS ONLY A PROMISE
+        */
+
         console.log("handleReload")
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData) 

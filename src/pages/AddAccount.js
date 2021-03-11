@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Qs from "qs"
 import axios from 'axios';
 import Header from '../components/Header';
 import { useHistory } from "react-router-dom"
@@ -7,6 +8,7 @@ import Loading from '../components/Loading';
 import ErrorScreen from '../components/ErrorScreen';
 import SuccessScreen from '../components/SuccessScreen';
 import {VelocityTransitionGroup} from "velocity-react"
+
 
 export default function AddAccount() {
   let history = useHistory();
@@ -20,17 +22,17 @@ export default function AddAccount() {
     setStep(1) 
 
     const catchError = error => {
+      setError("Check the console")
       console.error(error)
       setStep(-1)
-      setError("Check the console")
     }
     switch (provider) {
       case "payme":
-        axios.post( process.env.REACT_APP_API_URL+"bank_accounts/", {},
+        axios.post( process.env.REACT_APP_API_URL+"bank_accounts/", {bank:"payme"},
           {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
         ).then( (response) => {
           setSuccess("PayME Test Bank Account with €1000 added successfully"); setStep(2)
-        }).catch(error => catchError(error) );
+        }).catch(error => catchError(error.response) );
         break;
 
       case "deutschebank":
@@ -43,30 +45,31 @@ export default function AddAccount() {
         break;
 
       case "neonomics":
-        // window.location.href = `https://simulator-api.db.com/gw/oidc/authorize?response_type=code&redirect_uri=${process.env.REACT_APP_APP_URL}&client_id=${process.env.REACT_APP_deutschebank_client}` 
-        axios.post( "https://sandbox.neonomics.io/auth/realms/sandbox/protocol/openid-connect/token", {
+        axios.post( "https://sandbox.neonomics.io/auth/realms/sandbox/protocol/openid-connect/token", 
+        Qs.stringify({
           grant_type: "client_credentials",
           client_id: process.env.REACT_APP_neonomics_client,
           client_secret: process.env.REACT_APP_neonomics_secret,
-        }).then( (response) => {
+        }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
+        .then( (response) => {
+
           console.log(response)
           setStep(0) 
-        })
-        .catch((error) => {
-          console.log(error)
-          setStep(0) 
-        });
+
+        }).catch((error) => catchError(error.response));
         break;
 
+      case "klarna":
+        break;
       default:
         break;
     }
-
-    /*
-        axios.get( "", {}, {} ).then( (response) => {
-        }).catch(error => catchError(error) );
-    */
   }
+
+
+
+
+
 
 
   return (
@@ -81,10 +84,10 @@ export default function AddAccount() {
               <label className="form-label" >Select Bank</label>
               <select className="form-control" value={provider} onChange={(e)=>setProvider(e.target.value)}>
                 <option value="payme" selected> PayMe Test Bank </option>
-                <option value="deutschebank"> Deutsche Bank </option>
+                <option value="deutschebank"> Deutschebank </option>
                 <option value="rabobank"> Rabobank </option>
-                <option value="neonomics" > Neonomics banking aggregator </option>
-                <option value="klarna" disabled> Klarna banking aggregator </option>
+                <option value="neonomics" > Neonomics </option>
+                <option value="klarna" disabled> Klarna </option>
               </select>
             </div>
 
