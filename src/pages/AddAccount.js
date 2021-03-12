@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Qs from "qs"
 import axios from 'axios';
 import Header from '../components/Header';
-import { useHistory } from "react-router-dom"
+
+// import { useHistory } from "react-router-dom"  let history = useHistory();
 
 import Loading from '../components/Loading';
 import ErrorScreen from '../components/ErrorScreen';
@@ -11,59 +12,56 @@ import {VelocityTransitionGroup} from "velocity-react"
 
 
 export default function AddAccount() {
-  let history = useHistory();
 
   const [step, setStep] = useState(0);
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [provider, setProvider] = useState("payme")
 
   const createAccount = () => {
-    setStep(1) 
-
+    setStep(2) 
+    let auth = JSON.parse(localStorage.getItem('user'))?.token
     const catchError = error => {
-      setError("Check the console")
       console.error(error)
+      setError("Check the console")
       setStep(-1)
     }
-    switch (provider) {
-      case "payme":
-        axios.post( process.env.REACT_APP_API_URL+"bank_accounts/", {bank:"payme"},
-          {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
-        ).then( (response) => {
-          setSuccess("PayME Test Bank Account with €1000 added successfully"); setStep(2)
-        }).catch(error => catchError(error.response) );
-        break;
 
-      case "deutschebank":
-        window.location.href = `https://simulator-api.db.com/gw/oidc/authorize?response_type=code&redirect_uri=${process.env.REACT_APP_APP_URL+"add-account/deutschebank/"}&client_id=${process.env.REACT_APP_deutschebank_client}` 
-        break;
-
-      case "rabobank":
-        //remove trailing slash / 
-        window.location.href = `https://api-sandbox.rabobank.nl/openapi/sandbox/oauth2/authorize?client_id=${process.env.REACT_APP_rabobank_client}&response_type=code&scope=ais.balances.read%20ais.transactions.read-90days&redirect_uri=${process.env.REACT_APP_APP_URL.slice(0, -1)}/add-account/rabobank`
-        break;
-
-      case "neonomics":
-        axios.post( "https://sandbox.neonomics.io/auth/realms/sandbox/protocol/openid-connect/token", 
-        Qs.stringify({
-          grant_type: "client_credentials",
-          client_id: process.env.REACT_APP_neonomics_client,
-          client_secret: process.env.REACT_APP_neonomics_secret,
-        }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
-        .then( (response) => {
-
-          console.log(response)
-          setStep(0) 
-
-        }).catch((error) => catchError(error.response));
-        break;
-
-      case "klarna":
-        break;
-      default:
-        break;
+    if (provider === "payme") {
+        //The only one that goes directly
+        axios.post( process.env.REACT_APP_API_URL+"bank_accounts/", {bank:provider},
+          { headers: { Authorization: `Bearer ${auth}`}
+        }).then((response)=>{setSuccess("PayME Test Bank Account with €1000 added successfully");setStep(3)
+        }).catch(error => catchError(error.response));
+        return true;
     }
+
+    axios.post( process.env.REACT_APP_API_URL+"oauth/", 
+      {bank: provider, code: code}, { headers: { Authorization: `Bearer ${auth}`}
+    }).then((response)=>{
+
+      console.log(response)
+
+      if ("auth_url" in response.data) {
+        window.location.href = response.data.auth_url
+      } else if ("consent_url" in response.data) {
+        window.location.href = response.data.consent_url
+      } else if ("neonomicsBanks" in response.data) {
+        //SHOW BANKS STEP SELECT BANKS
+        setStep(1)
+      } else {
+        setSuccess("Bank Accounts added successfully")
+        setStep(3)
+      }
+    }).catch(error => {
+      if ("consent_url" in error.response.data) {
+        window.location.href = error.response.data.consent_url
+      } else {
+        setError("Invalid Authorization Token")
+        setStep(-1)
+      }    
+    });
   }
 
 
@@ -97,14 +95,10 @@ export default function AddAccount() {
           </div>
         </div>
       }
-      { (step === 1)  && <Loading />}
-      { (step === 2)  && <SuccessScreen account={success}/>}
+      { (step === 1)  && <span> Neonomics/Klarna bank accounts </span>}
+      { (step === 2)  && <Loading />}
+      { (step === 3)  && <SuccessScreen account={success}/>}
     </VelocityTransitionGroup>
-
-
-
-
-
   )
 }
 
