@@ -15,6 +15,9 @@ export default function LinkUser() {
   const [amount, setAmount] = useState(0);
   const [error, setError] = useState(0);
   const [userAndTransactionData, setUserAndTransactionData] = useState({ userName: "", amount: "", profile_picture: "" })
+  
+  let PrimaryBank = JSON.parse(localStorage.getItem('user')).user.bankAccounts.find(item => item.primary === "true")?.bank
+  const [otp, setOTP] = useState("");
 
 
   const getUser = (id) => {

@@ -8,55 +8,61 @@ import { faChevronLeft, faBackspace } from '@fortawesome/free-solid-svg-icons'
 export default function DB_otp({iban,amount,setOTP,backStep}) {
 	const [ID, setID] = useState();
 	const [authkey, setAuthKey] = useState();
-	
-	let key = JSON.parse(localStorage.getItem('user'))?.keys?.deutschebank?.access_token
-
-
 
   const executeOTPMethod = () => {
-	if (!key) {
-   		alert("No Key")
-   		return false
-   	}
-  	axios.post( "https://simulator-api.db.com:443/gw/dbapi/others/onetimepasswords/v2/single",
-	  {
-	    "method": "PHOTOTAN",
-	    "requestType": "INSTANT_SEPA_CREDIT_TRANSFERS",
-	    "requestData": {
-			type:"challengeRequestDataInstantSepaCreditTransfers",
-			targetIban: iban,
-	    	amountValue: amount,
-	    	amountCurrency: "EUR",
-	    }
-	  },
-      {headers: { Authorization: `Bearer ${key}` }}
+
+    axios.get( process.env.REACT_APP_API_URL+"access_token/",
+      {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
     ).then( (response) => {
-      setID(response.data.id)
-    })
-    .catch((error) => {
-    	alert(error.response.message)
-    });
+        let key = response.data
+        if (!key) {
+         		alert("No Key")
+         		return false
+         	}
+        	axios.post( "https://simulator-api.db.com:443/gw/dbapi/others/onetimepasswords/v2/single",
+          {
+            "method": "PHOTOTAN",
+            "requestType": "INSTANT_SEPA_CREDIT_TRANSFERS",
+            "requestData": {
+        		type:"challengeRequestDataInstantSepaCreditTransfers",
+        		targetIban: iban,
+            	amountValue: amount,
+            	amountCurrency: "EUR",
+            }
+          },
+            {headers: { Authorization: `Bearer ${key}` }}
+          ).then( (response) => {
+            setID(response.data.id)
+          })
+          .catch((error) => {
+          	alert(error.response.message+" - Please add again your DeutscheBank account - It needs to Refresh Token")
+          });
+    }).catch((error) => { alert(error.response) });
   }
-
   const answerOTPMethod = () => {
-	if (!key) {
-   		alert("No Key")
-   		return false
-   	}
-  	axios.patch( "https://simulator-api.db.com:443/gw/dbapi/others/onetimepasswords/v2/single/"+ID,
-	  { "response": authkey },
-      {headers: { Authorization: `Bearer ${key}` }}
+     
+     axios.get( process.env.REACT_APP_API_URL+"access_token/",
+      {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
     ).then( (response) => {
-      setOTP(response.data.otp)
-	})
-    .catch((error) => {
-    	alert(error.response.status)
-    });
+        let key = response.data
 
+        if (!key) {
+   	    	alert("No Key")
+   	    	return false
+   	    }
+  	    axios.patch( "https://simulator-api.db.com:443/gw/dbapi/others/onetimepasswords/v2/single/"+ID,
+        { "response": authkey },
+          {headers: { Authorization: `Bearer ${key}` }}
+        ).then( (response) => {
+          setOTP(response.data.otp)
+        })
+        .catch((error) => {
+        	alert(error.response.status)
+        });
+    }).catch((error) => { alert(error.response) });
   }
 
   useEffect(() => executeOTPMethod(), [])
-
 
 
   return     <div className="container">
