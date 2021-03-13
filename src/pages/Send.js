@@ -15,6 +15,8 @@ export default function Send() {
   const [amount, setAmount] = useState(0);
   const [error, setError] = useState("");
   const [otp, setOTP] = useState("");
+  
+  let PrimaryBank = JSON.parse(localStorage.getItem('user')).user.bankAccounts.find(item => item.primary === "true")?.bank
 
   const [userAndTransactionData, setUserAndTransactionData] = useState({ userName: "", amount: "", profile_picture: "" })
 
@@ -26,41 +28,42 @@ export default function Send() {
   	if (step === 1) {
 	  	setUser(value)
       setStep(2)
-  	} else if (step === 2) {
+  	
+    } else if (step === 2) {
       if (value <= 0 ) {
         return false
       }
       value = parseFloat(value)
 	  	setAmount(value)
 
-
-
-      if (true){//"deutschebank") {
+      if (PrimaryBank === "deutschebank") {
         setStep(3)
       } else {
         setStep(0)
-        axios.post( process.env.REACT_APP_API_URL+"transactions/", {},
-          {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }},
-        ).then( (response) => {
-          setUserAndTransactionData({
-            userName: `${response.data.receiver.first_name} ${response.data.receiver.last_name}`,
-            profile_picture:response.data.receiver.profile_picture,
-            amount: `${response.data.amount}€`,
-          })
-          setStep(4)
-        }).catch((error) => { setStep(-1); setError(error.response.data.code) });
+        axios.post( process.env.REACT_APP_API_URL+"transactions/", {
+            user_receiver_id: user.id,
+            amount: value,
+            bank: PrimaryBank,
+            otp: "",
+          },
+            {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }},
+          ).then( (response) => {
+            setUserAndTransactionData({
+              userName: `${response.data.receiver.first_name} ${response.data.receiver.last_name}`,
+              profile_picture:response.data.receiver.profile_picture,
+              amount: `${response.data.amount}€`,
+            })
+            setStep(4)
+          }).catch((error) => { setStep(-1); setError(error.response.data.code) });
       }
-
-    }
-    // HOW TO KNOW WHAT BANK  THIS IS IF DB
-    else if (step === 3) {
+    
+    } else if (step === 3) {
       setStep(0)
       axios.post( process.env.REACT_APP_API_URL+"transactions/", {
           user_receiver_id: user.id,
           amount: amount,
-          bank: "deutschebank",
+          bank: PrimaryBank,
           otp: value,
-          token: `Bearer ${JSON.parse(localStorage.getItem('user'))?.keys?.deutschebank?.access_token}`
         },
         {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }},
       )
@@ -86,6 +89,9 @@ export default function Send() {
       });
   	}
   }
+
+
+
 
   return <div>
     <VelocityTransitionGroup enter={{animation: (step === 3 || step === 0 || step === -1) ? "fadeIn" : "slideDown",duration:500,delay:600}} leave={{animation: "slideUp",duration:500}} >

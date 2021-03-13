@@ -12,63 +12,55 @@ import {VelocityTransitionGroup} from "velocity-react"
 
 
 export default function AddAccount() {
-
   const [step, setStep] = useState(0);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState("client_credentials");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [provider, setProvider] = useState("payme")
+  const [banks, setBanks] = useState([])
 
   const createAccount = () => {
     setStep(2) 
     let auth = JSON.parse(localStorage.getItem('user'))?.token
-    const catchError = error => {
-      console.error(error)
-      setError("Check the console")
-      setStep(-1)
-    }
 
     if (provider === "payme") {
-        //The only one that goes directly
-        axios.post( process.env.REACT_APP_API_URL+"bank_accounts/", {bank:provider},
-          { headers: { Authorization: `Bearer ${auth}`}
-        }).then((response)=>{setSuccess("PayME Test Bank Account with €1000 added successfully");setStep(3)
-        }).catch(error => catchError(error.response));
-        return true;
+      //The only one that goes directly
+      axios.post( process.env.REACT_APP_API_URL+"bank_accounts/", {bank:provider},
+        { headers: { Authorization: `Bearer ${auth}`}
+      }).then((response)=>{setSuccess("PayME Test Bank Account with €1000 added successfully");setStep(3)
+      }).catch(error => {console.error(error); setError("Check the console");setStep(-1)});
+      return true;
     }
 
     axios.post( process.env.REACT_APP_API_URL+"oauth/", 
       {bank: provider, code: code}, { headers: { Authorization: `Bearer ${auth}`}
     }).then((response)=>{
-
-      console.log(response)
-
+      console.warn(response)
       if ("auth_url" in response.data) {
         window.location.href = response.data.auth_url
       } else if ("consent_url" in response.data) {
         window.location.href = response.data.consent_url
-      } else if ("neonomicsBanks" in response.data) {
-        //SHOW BANKS STEP SELECT BANKS
+      } else if ("banks" in response.data) {
+        setBanks(response.data.banks)
+        setCode(JSON.stringify(
+          {id:response.data.banks[0]['id'], name:response.data.banks[0]['bankDisplayName']})
+        )
+        setProvider("neonomics")
         setStep(1)
       } else {
         setSuccess("Bank Accounts added successfully")
         setStep(3)
       }
     }).catch(error => {
-      if ("consent_url" in error.response.data) {
-        window.location.href = error.response.data.consent_url
-      } else {
+      console.warn(error)
+      //if ("consent_url" in error?.response?.data) {
+      //  window.location.href = error?.response?.data.consent_url
+      //} else {
         setError("Invalid Authorization Token")
         setStep(-1)
-      }    
+      //}    
     });
   }
-
-
-
-
-
-
 
   return (
     <VelocityTransitionGroup enter={{animation: "fadeIn", duration:500,delay:600}} leave={{animation: "slideUp",duration:500}} >
@@ -95,7 +87,23 @@ export default function AddAccount() {
           </div>
         </div>
       }
-      { (step === 1)  && <span> Neonomics/Klarna bank accounts </span>}
+      { (step === 1)  && 
+      <div className="container">
+          <div className="row mobile_row">
+            <Header back> Add Account </Header>
+            <div className="col-12 mobile_col">
+              <label className="form-label" >Select Bank</label>
+              <select className="form-control" value={code.name} onChange={(e)=>setCode(e.target.value)}>
+                {banks.map((i)=>{return<option value={
+                  JSON.stringify({id:i.id,name:i.bankDisplayName})
+                }>{i.bankDisplayName}</option>})}
+              </select>
+            </div>
+            <div className="col-12 mobile_col text-center">
+              <button className="btn btn-primary w-100 mb-3" onClick={createAccount}>Submit</button>
+            </div>
+          </div>
+        </div>}
       { (step === 2)  && <Loading />}
       { (step === 3)  && <SuccessScreen account={success}/>}
     </VelocityTransitionGroup>
