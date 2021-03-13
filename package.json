@@ -26,13 +26,15 @@
     "react-scripts": "4.0.2",
     "react-slick": "^0.28.0",
     "react-transition-group": "^4.4.1",
+    "serve": "^11.3.2",
     "slick-carousel": "^1.8.1",
     "uuid": "^8.3.2",
     "velocity-react": "^1.4.3",
     "web-vitals": "^1.1.0"
   },
   "scripts": {
-    "start": "env-cmd -f .env react-scripts start",
+    "start": "serve -s build",
+    "dev": "env-cmd -f .env react-scripts start",
     "build": "env-cmd -f .env react-scripts build",
     "test": "env-cmd -f .env react-scripts test",
     "eject": "env-cmd -f .env react-scripts eject"
