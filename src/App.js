@@ -76,27 +76,6 @@ function App() {
           keys: getUser()?.keys
         }
 
-        /*
-          THESE ARE REFRESHED FROM THE BACKEND (sigh)
-
-          for each userData.keys get axios and change data !async! 
-          if (userData.keys?.deutschebank) {
-            axios.post( "https://simulator-api.db.com/gw/oidc/token", Qs.stringify({
-              grant_type:"refresh_token", refresh_token: userData.keys.deutschebank.refresh_token
-            }),
-            {headers: { Authorization: `Bearer ${userData.keys.deutschebank.access_token}`, 
-              "Content-Type": "application/x-www-form-urlencoded" }} 
-            ).then( (response) => { userData.keys.deutschebank = response.data })
-          }
-          if (userData.keys?.rabobank) {
-            axios.get( "https://simulator-api.db.com/gw/dbapi/v1/cashAccounts",
-              {headers: { Authorization: `Bearer ${userData.keys.rabobank.access_token}` }} 
-            ).then( (response) => { userData.keys.rabobank = response.data })
-          }
-          
-          TAKE CARE BELOW MAY WORK BEFORE EDITED USER DATA AND SAY ITS ONLY A PROMISE
-        */
-
         console.log("handleReload")
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData) 
@@ -110,6 +89,13 @@ function App() {
     }
   }
 
+  const refreshTokens = () => {
+    axios.get(process.env.REACT_APP_API_URL+"refresh", {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+    ).then(({ data }) => {
+      console.log("Refreshed tokens")
+    })
+  }
+
 
   let location = useLocation();
   let history = useHistory();
@@ -118,16 +104,10 @@ function App() {
     if (location.pathname === "/") {
       handleReload()
     }
-    // SET TO TRUE TO ACTIVATE THE TIMER / REPLACE WITH A SERVICE PROVIDER <3
-    if (false) {
-      const interval = setInterval(() => {
-        if (location.pathname === "/") {
-          console.log("Debug - Handling reload")
-          handleReload()
-        }
-      }, 60000); // Every minute 
-      return () => clearInterval(interval);
-    }
+    const interval = setInterval(() => {
+        refreshTokens()
+    }, 60000*8); // Every 8 minutes
+    return () => clearInterval(interval);
   }, [location.pathname]);
 
 
