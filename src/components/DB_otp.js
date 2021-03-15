@@ -11,7 +11,7 @@ export default function DB_otp({iban,amount,setOTP,backStep}) {
 
   const executeOTPMethod = () => {
 
-    axios.get( process.env.REACT_APP_API_URL+"access_token/",
+    axios.get( process.env.REACT_APP_API_URL+"access_token/?bank=deutschebank", 
       {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
     ).then( (response) => {
         let key = response.data
@@ -37,13 +37,13 @@ export default function DB_otp({iban,amount,setOTP,backStep}) {
           .catch((error) => {
           	alert(error.response.message+" - Please add again your DeutscheBank account - It needs to Refresh Token")
           });
-    }).catch((error) => { alert(error.response) });
+    }).catch((error) => { alert( JSON.stringify(error.response.data)) });
   }
   const answerOTPMethod = () => {
      
-     axios.get( process.env.REACT_APP_API_URL+"access_token/",
+     axios.get( process.env.REACT_APP_API_URL+"access_token/?bank=deutschebank",
       {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
-    ).then( (response) => {
+      ).then( (response) => {
         let key = response.data
 
         if (!key) {
@@ -57,9 +57,13 @@ export default function DB_otp({iban,amount,setOTP,backStep}) {
           setOTP(response.data.otp)
         })
         .catch((error) => {
-        	alert(error.response.status)
+          setID(null)
+          executeOTPMethod()
+          alert(error.response.data.message)
         });
-    }).catch((error) => { alert(error.response) });
+      }).catch((error) => { 
+        alert(error.response);
+      });
   }
 
   useEffect(() => executeOTPMethod(), [])
@@ -79,7 +83,7 @@ export default function DB_otp({iban,amount,setOTP,backStep}) {
               }
             </div>
             <div className="col-6 mt-5 mobile_col title d-flex justify-content-between">
-              <span> Authorize the transaction  {JSON.stringify(ID)} </span>
+              <span> Authorize the transaction</span>
             </div>
           </div>
         </div>
@@ -92,7 +96,7 @@ export default function DB_otp({iban,amount,setOTP,backStep}) {
         </div>
 
         <div className="col-12 mobile_col ">
-          <button className="btn btn-primary w-100 mb-3" onClick={answerOTPMethod}>
+          <button className="btn btn-primary w-100 mb-3" onClick={answerOTPMethod} disabled={ID==null} >
             Authorize transaction
           </button>
         </div>

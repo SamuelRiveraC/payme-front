@@ -52,13 +52,9 @@ export default function AddAccount() {
         setStep(3)
       }
     }).catch(error => {
-      console.warn(error)
-      //if ("consent_url" in error?.response?.data) {
-      //  window.location.href = error?.response?.data.consent_url
-      //} else {
-        setError("Invalid Authorization Token")
-        setStep(-1)
-      //}    
+      console.error(error, error.response)
+      setError(error.response.data.message)
+      setStep(-1)
     });
   }
 
@@ -94,9 +90,19 @@ export default function AddAccount() {
             <div className="col-12 mobile_col">
               <label className="form-label" >Select Bank</label>
               <select className="form-control" value={code.name} onChange={(e)=>setCode(e.target.value)}>
-                {banks.map((i)=>{return<option value={
-                  JSON.stringify({id:i.id,name:i.bankDisplayName})
-                }>{i.bankDisplayName}</option>})}
+                {banks.map((i)=>{
+                  if (i.status === "AVAILABLE"  
+                    && i.bankDisplayName != "OP"
+                    && i.bankDisplayName != "Storebrand"
+                    && i.bankDisplayName != "Hizonti Bank"
+                    && i.bankDisplayName != "Justo Bank"
+                    ) {
+                      return <option value={ JSON.stringify({id:i.id,name:i.bankDisplayName})}>
+                        {i.bankDisplayName} </option>
+                      } else {
+                        return false
+                      }
+                  })}
               </select>
             </div>
             <div className="col-12 mobile_col text-center">

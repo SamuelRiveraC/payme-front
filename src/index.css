@@ -163,6 +163,7 @@ a {
 } .transactions ul {
 	list-style: none;
 	padding:0;
+	min-height: 40vh; 
 } .transactions li {
 	margin-bottom: 1em;
 } .transactions .image img {

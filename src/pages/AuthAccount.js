@@ -9,6 +9,7 @@ import SuccessScreen from '../components/SuccessScreen';
 import {VelocityTransitionGroup} from "velocity-react"
 
 //let history = useHistory() history.push("/")
+/*TAKE CARE WITH REDIRECTIONS FAILING, IT WILL RETURN SUCCESS*/
 export default function AddAccount() {
   const { bank } = useParams();
   const [step, setStep] = useState(1);
@@ -32,7 +33,8 @@ export default function AddAccount() {
           setSuccess("Bank Accounts added successfully")
           setStep(2)
         }).catch(error => {
-          setError("Invalid Authorization Token")
+          console.error(error, error.response)
+          setError(error.response.data.message)
           setStep(-1)
         });
 

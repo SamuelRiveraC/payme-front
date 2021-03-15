@@ -15,14 +15,12 @@ export default function Dashboard({user}) {
   if (user.notifications)
     Notifications = user.notifications.filter(function(item) { return item.status === 0; });
 
-  if (user.transactionsSent && user.transactionsReceived)
-    AllTransactions = [...user.transactionsSent,...user.transactionsReceived]
+  if (user.transactionsSent && user.transactionsReceived && user.transactionsAPI)
+    AllTransactions = [...user.transactionsSent,...user.transactionsReceived,...user.transactionsAPI]
 
   AllTransactions = AllTransactions.sort( function(a,b) { 
-      let c = new Date(a.updated_at);
-      let d = new Date(b.updated_at);
-      return d-c; 
-    } ).slice(0, 10);    
+    let c = new Date(a.updated_at); let d = new Date(b.updated_at); return d-c; 
+  } ).slice(0, 8);    
 
   return <div className="container">
     <div className="row mobile_row">
