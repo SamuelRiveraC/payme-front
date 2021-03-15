@@ -33,8 +33,7 @@
     "web-vitals": "^1.1.0"
   },
   "scripts": {
-    "start": "serve -s build",
-    "dev": "env-cmd -f .env react-scripts start",
+    "start": "env-cmd -f .env react-scripts start",
     "build": "env-cmd -f .env react-scripts build",
     "test": "env-cmd -f .env react-scripts test",
     "eject": "env-cmd -f .env react-scripts eject"
