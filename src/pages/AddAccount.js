@@ -94,8 +94,8 @@ export default function AddAccount() {
                   if (i.status === "AVAILABLE"  
                     && i.bankDisplayName != "OP"
                     && i.bankDisplayName != "Storebrand"
-                    //&& i.bankDisplayName != "Hizonti Bank"
-                    //&& i.bankDisplayName != "Justo Bank"
+                    && i.bankDisplayName != "Hizonti Bank"
+                    && i.bankDisplayName != "Justo Bank"
                     ) {
                       return <option value={ JSON.stringify({id:i.id,name:i.bankDisplayName})}>
                         {i.bankDisplayName} </option>

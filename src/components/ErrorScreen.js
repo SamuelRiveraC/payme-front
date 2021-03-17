@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 export default function ErrorScreen({error, tryAgain}) {
   const getError = () => {
     if (error === "E_ROW_NOT_FOUND")
-      return "This item aws not found"
-    else if (error === "E_ROW_SAME_USER")
-      return "You can send a transaction or request to yourself"
+      return "This item was not found"
+    else if (error === "E_ROW_SAME_USER" || error === "E_SAME_USER")
+      return "You can't send a transaction or request to yourself"
     else if (error === "E_TRANSACTION_PAID")
       return "This transaction has been already paid"
     else if (error === "E_TRANSACTION_CANCELLED")

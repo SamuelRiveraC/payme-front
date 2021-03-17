@@ -50,6 +50,7 @@ function App() {
     user.date = Date.now()
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
+    refreshTokens()
     history.push("/")
   }
   const handleLogout = () => {
