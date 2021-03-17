@@ -18,7 +18,7 @@ export default function Transaction({transaction}) {
             <img src={"https://via.placeholder.com/160/29363D/EDF4FC?text="+transaction.party.slice(0,2)} height={60} alt="transaction" />
         </div>
         <div className="col-6 text-left information">
-            <b> {transaction.party} </b>
+            <b> * {transaction.party} </b>
             <br /> <small> {transactionDate} </small>
         </div>
         <div className="col-4 text-right amount">

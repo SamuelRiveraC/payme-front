@@ -12,7 +12,9 @@ export default class AutosuggestInput extends React.Component {
   }
 
   getInfo = async e => {
-    axios.get(process.env.REACT_APP_API_URL+"users/search/"+this.state.query)
+    axios.get(process.env.REACT_APP_API_URL+"users/search/"+this.state.query, {
+      headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }
+    })
     .then(({ data }) => {
       this.setState({ results: data })
     })
