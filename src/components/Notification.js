@@ -17,7 +17,7 @@ export default function Notification({notificationProp}) {
 
   const read = () => {
     if (notification.type === 0 && notification.status === 0) {
-      history.push("/request/"+notification.id)
+      history.push("/request/"+notification.transaction_id)
       return true
     }
 
