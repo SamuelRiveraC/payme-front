@@ -10,6 +10,8 @@ export default function DB_otp({iban,amount,setOTP,backStep}) {
 	const [authkey, setAuthKey] = useState();
 
   const executeOTPMethod = () => {
+        
+
 
     axios.get( process.env.REACT_APP_API_URL+"access_token/?bank=deutschebank", 
       {headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` }}
@@ -19,7 +21,7 @@ export default function DB_otp({iban,amount,setOTP,backStep}) {
          		alert("No Key")
          		return false
          	}
-        	axios.post( "https://simulator-api.db.com:443/gw/dbapi/others/onetimepasswords/v2/single",
+           	axios.post( "https://simulator-api.db.com:443/gw/dbapi/others/onetimepasswords/v2/single",
           {
             "method": "PHOTOTAN",
             "requestType": "INSTANT_SEPA_CREDIT_TRANSFERS",
@@ -29,7 +31,9 @@ export default function DB_otp({iban,amount,setOTP,backStep}) {
             	amountValue: amount,
             	amountCurrency: "EUR",
             }
+
           },
+
             {headers: { Authorization: `Bearer ${key}` }}
           ).then( (response) => {
             setID(response.data.id)

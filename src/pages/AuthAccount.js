@@ -65,6 +65,20 @@ export default function AddAccount() {
       }
       { (step === 1)  && <Loading />}
       { (step === 2)  && <SuccessScreen account={success}/>}
+
+      { (step === 3) && <div className="container">
+          <div className="row mobile_row">
+            <Header back> Add Account. </Header>
+
+            <div className="col-12 mobile_col">
+            </div>
+            <div className="col-12 mobile_col text-center">
+              {/*onClick={createAccount}*/}
+              <button className="btn btn-primary w-100 mb-3" >Submit</button>
+            </div>
+          </div>
+        </div>
+      }
     </VelocityTransitionGroup>
 
 

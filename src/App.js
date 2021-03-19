@@ -13,17 +13,17 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Notifications from './pages/Notifications';
 
+import TransactionControl from './pages/TransactionControl';
 import Send from './pages/Send';
 import Request from './pages/Request';
+import LinkUser from './pages/LinkUser';
+import LinkRequest from './pages/LinkRequest';
 
 import Accounts from './pages/Accounts';
 import Account from './pages/Account';
 import AddAccount from './pages/AddAccount';
 import AuthAccount from './pages/AuthAccount';
 
-
-import LinkUser from './pages/LinkUser';
-import LinkRequest from './pages/LinkRequest';
 
 import { TransitionGroup, CSSTransition } from 'react-transition-group';    
 
@@ -104,10 +104,17 @@ function App() {
   useEffect(() => {
     if (location.pathname === "/") {
       handleReload()
+    } 
+    if (location.pathname === "/send-payment" || location.pathname === "/request-payment" 
+      || location.pathname === "/user/:userSlug" || location.pathname === "/request/:transactionID") {
+      refreshTokens()
     }
+
+    
+
     const interval = setInterval(() => {
         refreshTokens()
-    }, 60000*8); // Every 8 minutes
+    }, 60000*5); // Every 5 minutes
     return () => clearInterval(interval);
   }, [location.pathname]);
 
@@ -146,20 +153,36 @@ function App() {
           <Route path="/settings" >
             <Settings logout={handleLogout} user={ user.user }/>
           </Route>
+
+
+
+
+
+
+
           <Route path="/send-payment">
-            <Send />
+             {/*<Send />*/}
+            <TransactionControl transactionType="Send"/>
           </Route>
           <Route path="/request-payment">
-            <Request />
+             {/*<Request />*/}
+            <TransactionControl transactionType="Request"/>
           </Route>
-  
-          <Route path="/user/:id">
-            <LinkUser />
+          <Route path="/user/:userSlug">
+             {/*<LinkUser />*/}
+            <TransactionControl transactionType="User"/>
           </Route>
-  
-          <Route path="/request/:id">
-            <LinkRequest />
+          <Route path="/request/:transactionID">
+             {/*<LinkRequest />*/}
+            <TransactionControl transactionType="Payment"/>
           </Route>
+
+
+
+
+
+
+
           
           <Route path="/accounts">
             <Accounts user={ user.user }/>

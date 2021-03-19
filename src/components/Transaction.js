@@ -14,15 +14,16 @@ export default function Transaction({transaction}) {
     return transaction.fetch_type === "debit" || transaction.fetch_type === "credit" ? 
 
     <li className="row"> 
+        
         <div className="col-2 text-left image">
-            <img src={"https://via.placeholder.com/160/29363D/EDF4FC?text="+transaction.party.slice(0,2)} height={60} alt="transaction" />
+            <img src={"https://via.placeholder.com/160/112497/EDF4FC?text="+transaction.party.slice(0,2)} height={60} alt="transaction" />
         </div>
-        <div className="col-6 text-left information">
+        <div className="col-5 text-left information">
             <b> {transaction.party} </b>
-            <br /> <small> {transactionDate} </small>
+            <br /> <small> {transactionDate}</small>
         </div>
-        <div className="col-4 text-right amount">
-            {transaction.fetch_type === "debit" && "-"} {transaction.amount.toFixed(2)}€    
+        <div className="col-5 text-right amount" style={transaction.fetch_type === "debit" ? {color:"#932727"} : {}}>
+            {transaction.fetch_type === "debit" && "-"} {parseFloat(transaction.amount).toFixed(2)}€    
         </div>
     </li>
 
@@ -30,15 +31,15 @@ export default function Transaction({transaction}) {
 
     <li className="row">
     	<div className="col-2 text-left image">
-            {user.id === transaction.sender.id   && <img src={transaction.receiver.profile_picture  } height={60} alt="transaction" />}
-            {user.id === transaction.receiver.id && <img src={transaction.sender.profile_picture} height={60} alt="transaction" />}
+            {user.id === transaction.sender.id   && <img src={transaction.sender.profile_picture  } height={60} alt="transaction" />}
+            {user.id === transaction.receiver.id && <img src={transaction.receiver.profile_picture} height={60} alt="transaction" />}
     	</div>
-    	<div className="col-6 text-left information">
+    	<div className="col-5 text-left information">
             {user.id === transaction.sender.id   && <b> {transaction.receiver.first_name} {transaction.receiver.last_name} </b> }
 			{user.id === transaction.receiver.id && <b> {transaction.sender.first_name} {transaction.sender.last_name} </b> }
-            <br /> <small> {transactionDate} </small>
+            <br /> <small> {transactionDate}</small>
     	</div>
-    	<div className="col-4 text-right amount">
+    	<div className="col-5 text-right amount" style={user.id === transaction.user_sender_id ? {color:"#932727"} : {}}>
 			{user.id === transaction.user_sender_id && "-"} {transaction.amount.toFixed(2)}€	
     	</div>
     </li>

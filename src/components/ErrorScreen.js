@@ -34,6 +34,10 @@ export default function ErrorScreen({error, tryAgain}) {
           <Link className="btn btn-outline-primary w-100 mt-5" to="/">
             Go to Main Menu
           </Link>
+
+          {tryAgain && <button className="btn btn-outline-primary w-100 mt-5" onClick={()=>tryAgain()}>
+            Try Again
+          </button> }
         </div>
 
       </div>
