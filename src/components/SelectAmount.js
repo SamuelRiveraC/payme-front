@@ -15,10 +15,6 @@ export default function SearchUsers( {userName,backStep,operation,setTransaction
         if (!amount.includes(".") ) {
           setAmount(amount+".")
         } 
-      } else if (input === "-") {
-        if (!amount.includes("-") ) {
-          setAmount(amount+"-")
-        } 
       } else if (input !== " " && !isNaN(input)) {
 
         let checkString = amount.split(".")

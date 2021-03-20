@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import BankAccount from '../components/BankAccount';
 import Header from '../components/Header';
 
-export default function Accounts({user}) {
-  const accounts = user.bankAccounts
+export default function Accounts({BankAccounts}) {
+  const accounts = BankAccounts
   
   return(
     <div className="container">

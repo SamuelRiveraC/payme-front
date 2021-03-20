@@ -11,7 +11,7 @@ import Register from './pages/Register';
 
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
-import Notifications from './pages/Notifications';
+import NotificationsComponent from './pages/Notifications';
 
 import TransactionControl from './pages/TransactionControl';
 import Send from './pages/Send';
@@ -45,13 +45,16 @@ function App() {
     return user
   }
   const [user, setUser] = useState(getUser()) 
+  const [BankAccountsState, SetBankAccounts] = useState([]) 
+  const [TransactionsState, SetTransactions] = useState([]) 
+  const [NotificationsState, SetNotifications] = useState([]) 
 
   const handleLogin = user => {
     user.date = Date.now()
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
     refreshTokens()
-    history.push("/")
+    history.replace("/")
   }
   const handleLogout = () => {
     axios.get(process.env.REACT_APP_API_URL+"logout", {headers: { Authorization: `Bearer ${getUser()?.token}` }}
@@ -59,44 +62,56 @@ function App() {
       localStorage.clear()
       setUser(undefined)
       history.replace("/")
-      // history.clear()
     })
   }
 
 
   const handleReload = () => {
     if (getUser()?.token) {
+      
       axios.get( process.env.REACT_APP_API_URL+"auth/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
-        //Should Recover token and reload it      console.log(response.data)
-        let userData = {
-          type: "bearer",
-          token: getUser()?.token,
-          user: response.data,
-          date: Date.now(),
-          keys: getUser()?.keys
-        }
-
-        console.log("handleReload")
+        let userData = { token: getUser()?.token, user: response.data, date: Date.now() }
         localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData) 
-
-      })
-      .catch((error) => {
-        // alert(error.response.data.code)
+        setUser(userData.user) 
+      }).catch((error) => {
+        console.error(error.response.data)
         localStorage.clear()
-        history.push("/login")
+        history.replace("/login")
       });
+
+      axios.get( process.env.REACT_APP_API_URL+"fetch-banks/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      ).then( (response) => {
+        SetBankAccounts(response.data)
+      }).catch((error) => {
+        console.warn(error.response)
+      });
+
+      axios.get( process.env.REACT_APP_API_URL+"fetch-transactions/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      ).then( (response) => {
+        SetTransactions(response.data)
+      }).catch((error) => {
+        console.warn(error.response)
+      });
+
+      axios.get( process.env.REACT_APP_API_URL+"fetch-notifications/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      ).then( (response) => {
+        SetNotifications(response.data)
+      }).catch((error) => {
+        console.warn(error.response)
+      });
+
     }
   }
 
   const refreshTokens = () => {
-    axios.get(process.env.REACT_APP_API_URL+"refresh", {headers: { Authorization: `Bearer ${getUser()?.token}` }}
-    ).then(({ data }) => {
-      console.log("Refreshed tokens")
-    })
+    if (getUser()?.token) {
+      axios.get(process.env.REACT_APP_API_URL+"refresh-tokens", {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      ).then(({ data }) => {
+        console.log("Refreshed tokens")
+      })
+    }
   }
-
 
   let location = useLocation();
   let history = useHistory();
@@ -105,21 +120,24 @@ function App() {
     if (location.pathname === "/") {
       handleReload()
     } 
+
     if (location.pathname === "/send-payment" || location.pathname === "/request-payment" 
       || location.pathname === "/user/:userSlug" || location.pathname === "/request/:transactionID") {
       refreshTokens()
     }
 
     
-
-    const interval = setInterval(() => {
+    const interval_data = setInterval(() => {
+        handleReload()
+    }, 60000*1);
+    const interval_tokens = setInterval(() => {
         refreshTokens()
     }, 60000*5); // Every 5 minutes
-    return () => clearInterval(interval);
+    return () => {clearInterval(interval_data);clearInterval(interval_tokens);  };
   }, [location.pathname]);
 
 
-  //console.log(!getUser() ? "No session" : "Session active", getUser(), "-" , !user ? "No session" : "Session active" , user)
+  //console.log(!getUser() ? "No session" : "Session active", getUser().user, "-" , !user ? "No session" : "Session active" , user)
 
 
   if (!user) {
@@ -143,15 +161,15 @@ function App() {
   }
 
   return (
-    <TransitionGroup user={ user.user }>
+    <TransitionGroup user={ user }>
       <CSSTransition key={location.key}  classNames="fade" timeout={300} >
         <Switch location={location}>
   
           <Route path="/notifications">
-            <Notifications user={ user.user }/>
+            <NotificationsComponent Notifications={ NotificationsState }/>
           </Route>
           <Route path="/settings" >
-            <Settings logout={handleLogout} user={ user.user }/>
+            <Settings logout={handleLogout} user={ user }/>
           </Route>
 
 
@@ -185,7 +203,7 @@ function App() {
 
           
           <Route path="/accounts">
-            <Accounts user={ user.user }/>
+            <Accounts user={ user } BankAccounts={BankAccountsState}/>
           </Route>
           <Route path="/account/:id">
             <Account />
@@ -201,7 +219,7 @@ function App() {
           </Route>
 
           <Route path="/" >
-            <Dashboard user={ user.user }/>
+            <Dashboard user={ user } BankAccounts={BankAccountsState} Transactions={TransactionsState} Notifications={NotificationsState}/>
           </Route>
         </Switch>
       </CSSTransition>

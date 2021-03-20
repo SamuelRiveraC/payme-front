@@ -72,7 +72,10 @@ export default function TransactionControl({transactionType}) {
 
 				setStep(3)
 			} else if (response.data.bank === "rabobank") { 
-		        window.location.href = response.data.url
+		       	window.open(response.data.url, '_blank')
+				SetSuccessMessage(response.data)
+				setStep(true)
+
 			} else if (response.data.bank === "neonomics") { 
 		        window.location.href = response.data.url
 			} else {

@@ -2,11 +2,11 @@ import React from 'react';
 import Header from '../components/Header';
 import Notification from '../components/Notification';
 
-export default function Notifications({user}) {
+export default function NotificationsComponent({Notifications}) {
   
   //SHOULD BE LOADED ASYNC => NOTIFICATIONS
-
-  const notifications = user.notifications.sort(function(a, b) {
+  /*
+  const notifications = Notifications.sort(function(a, b) {
     return a.status - b.status;
   }).sort( function(a,b) { 
     let c = new Date(a.updated_at);
@@ -14,7 +14,7 @@ export default function Notifications({user}) {
     return d-c; 
   } )
 
-
+*/
   return <div className="container">
       <div className="row mobile_row">
 
@@ -24,7 +24,7 @@ export default function Notifications({user}) {
 
         <div className="col-12 mobile_col">
           <ul className="notification">
-            { notifications.map( (item,index) => {
+            { Notifications.map( (item,index) => {
               return <Notification key={index} notificationProp={item} />
             } ) }
           </ul>      

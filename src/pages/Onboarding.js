@@ -4,6 +4,7 @@ import Slider from "react-slick";
 import '../slick.css';
 
 import logo from "../img/PayME_logo.png"
+import logoUnicorn from "../img/payme-light.png"
 import Money_transfer_1 from "../img/Money_transfer_1.png"
 import Money_transfer_2 from "../img/Money_transfer_2.png"
 
@@ -25,6 +26,7 @@ function Onboarding() {
 
         <Slider {...settings}>
           <div>
+            <img src={logoUnicorn} alt="Logo" height="64" className="mb-0"/>
             <img src={logo} alt="Logo" />
             <br/>
             <h3>Easy payments for individuals and business</h3>

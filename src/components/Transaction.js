@@ -7,7 +7,7 @@ export default function Transaction({transaction}) {
     const mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(d);
     const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
     const transactionDate = `${da}-${mo}-${ye}`
-    const user = JSON.parse(localStorage.getItem('user')).user;
+    const user = JSON.parse(localStorage.getItem('user'))?.user;
 
     // NEW MODEL DEPENDING ON WHO DEBITS AND CREDITS
 
@@ -16,7 +16,7 @@ export default function Transaction({transaction}) {
     <li className="row"> 
         
         <div className="col-2 text-left image">
-            <img src={"https://via.placeholder.com/160/112497/EDF4FC?text="+transaction.party.slice(0,2)} height={60} alt="transaction" />
+            <img src={"https://via.placeholder.com/160/"+transaction.color+"/EDF4FC?text="+transaction.party.slice(0,2)} height={60} alt="transaction" />
         </div>
         <div className="col-5 text-left information">
             <b> {transaction.party} </b>
