@@ -14,6 +14,7 @@ import Settings from './pages/Settings';
 import NotificationsComponent from './pages/Notifications';
 
 import TransactionControl from './pages/TransactionControl';
+import TransactionCallback from './pages/TransactionCallback';
 import Send from './pages/Send';
 import Request from './pages/Request';
 import LinkUser from './pages/LinkUser';
@@ -194,6 +195,11 @@ function App() {
              {/*<LinkRequest />*/}
             <TransactionControl transactionType="Payment"/>
           </Route>
+          <Route path="/complete-payment/:bank">
+             {/*<LinkRequest />*/}
+            <TransactionCallback />
+          </Route>
+
 
 
 

@@ -9,6 +9,7 @@ export default function Transaction({transaction}) {
     const transactionDate = `${da}-${mo}-${ye}`
     const user = JSON.parse(localStorage.getItem('user'))?.user;
 
+    let image = (transaction.party===null || transaction.party===undefined) ? "No Name" : transaction.party.slice(0,2)
     // NEW MODEL DEPENDING ON WHO DEBITS AND CREDITS
 
     return transaction.fetch_type === "debit" || transaction.fetch_type === "credit" ? 
@@ -16,10 +17,10 @@ export default function Transaction({transaction}) {
     <li className="row"> 
         
         <div className="col-2 text-left image">
-            <img src={"https://via.placeholder.com/160/"+transaction.color+"/EDF4FC?text="+transaction.party.slice(0,2)} height={60} alt="transaction" />
+            <img src={"https://via.placeholder.com/160/"+transaction.color+"/EDF4FC?text="+image} height={60} alt="transaction" />
         </div>
         <div className="col-5 text-left information">
-            <b> {transaction.party} </b>
+            <b> {(transaction.party===null || transaction.party===undefined) ? "No Name" : transaction.party} </b>
             <br /> <small> {transactionDate}</small>
         </div>
         <div className="col-5 text-right amount" style={transaction.fetch_type === "debit" ? {color:"#932727"} : {}}>

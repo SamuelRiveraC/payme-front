@@ -45,7 +45,7 @@ export default function Register({ setToken }) {
 
 
         <div className="col-12 mobile_col">
-          <Validation active={alerts.duplicated}> The Account already exists  </Validation> <br/>
+          <Validation active={alerts.duplicated}> The Account email or phone number already exists  </Validation> <br/>
 
         	<div className="form-outline ">
             <label className="form-label" >First name</label>
