@@ -10,6 +10,9 @@ export default function Dashboard({user, BankAccounts, Transactions, Notificatio
     balance = BankAccounts.find(item => item.primary === "true")?.balance;
   }
 
+  const AllTransactions = Transactions.sort ( function(a,b) { 
+    let c = new Date(a.updated_at); let d = new Date(b.updated_at); return d-c; 
+  } )
 
 
   return <div className="container">
@@ -44,7 +47,7 @@ export default function Dashboard({user, BankAccounts, Transactions, Notificatio
       <div className="col-12 mobile_col text-center transactions">
         <p>Recent Activity</p>  
         <ul>
-          { Transactions.map( (item,index) => {
+          { AllTransactions.map( (item,index) => {
             return <Transaction key={index} transaction={item} />
           } ) }
         </ul>      
