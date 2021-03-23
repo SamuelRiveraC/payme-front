@@ -6,6 +6,7 @@ import Loading from '../components/Loading';
 import SearchUser from '../components/SearchUser';
 import SelectAmount from '../components/SelectAmount';
 import AuthorizeTransaction from '../components/AuthorizeTransaction';
+import PaymentDetails from '../components/PaymentDetails';
 
 import ErrorScreen from '../components/ErrorScreen';
 import SuccessScreen from '../components/SuccessScreen';
@@ -48,7 +49,8 @@ export default function TransactionControl({transactionType}) {
 	}
 	const handleAmount = (value) => {
 		setAmount( parseFloat(value) )
-		handleAuthorization(parseFloat(value))
+		setStep(3)
+		//	handleAuthorization(parseFloat(value))
 	}
 
 
@@ -70,7 +72,7 @@ export default function TransactionControl({transactionType}) {
 
 
 
-				setStep(3)
+				setStep(4)
 			} else if (response.data.bank === "rabobank") { 
 		       	window.open(response.data.url, '_blank')
 				SetSuccessMessage(response.data)
@@ -144,7 +146,8 @@ export default function TransactionControl({transactionType}) {
    				})
 			break;
 			case "Payment":
-				handleAuthorization()
+				setStep(3)
+				//handleAuthorization()
 				break;
 			default:
 				setStep(1)
@@ -162,12 +165,23 @@ export default function TransactionControl({transactionType}) {
 			
 			{ (step === false) && <ErrorScreen error={error} tryAgain={tryAgain}/>}
 			{ (step === null)  && <Loading />}
-			{ (step === true)  && <SuccessScreen operation={transactionType==="Request"?"requested":"sent"} data={userData}/>}
+			{ (step === true)  && <SuccessScreen operation={transactionType==="Request"?"requested":"sent"} 
+									data={userData}/>}
 	
-			{ (step === 1)  && <SearchUser 	 operation={transactionType==="Request"?"Request":"Send"} setTransactionUser={ handleUser }/>}
-			{ (step === 2)  && <SelectAmount operation={transactionType==="Request"?"Request":"Send"} setTransactionAmount={ handleAmount } 
-								userName={`${user.first_name} ${user.last_name}`} backStep={ backStep } />}
-			{ (step === 3)  && <AuthorizeTransaction handleAuthorization={handleAuthorizationCallBack} backStep={backStep} />}
+			{ (step === 1)  && <SearchUser 	 operation={transactionType==="Request"?"Request":"Send"}
+									setTransactionUser={ handleUser }/>}
+			{ (step === 2)  && <SelectAmount operation={transactionType==="Request"?"Request":"Send"}
+									setTransactionAmount={ handleAmount } 
+									userName={`${user.first_name} ${user.last_name}`} 
+									backStep={ backStep } />}
+
+			{ (step === 3)  && <PaymentDetails data={{user:user, amount:amount}} 
+									handlePayment={handleAuthorization}
+									backStep={backStep} />}
+
+			{ (step === 4)  && <AuthorizeTransaction
+									handleAuthorization={handleAuthorizationCallBack}
+									backStep={backStep} />}
 
 		</VelocityTransitionGroup>
 	</div>

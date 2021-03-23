@@ -25,6 +25,23 @@ body {
 } .dashboard svg, .dashboard a {
 	color: #EDF4FC;
 }
+
+
+.LogoLight {
+	display: none;
+}
+.LogoColor {
+	display: inline;
+}
+
+.dashboard .LogoLight {
+	display: inline;
+}
+.dashboard .LogoColor {
+	display: none;
+}
+
+
 .container-fluid, .container {
 	background: #EDF4FC;
 	min-height:100vh;

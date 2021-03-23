@@ -8,6 +8,8 @@ export default function Transaction({transaction}) {
     const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
     const transactionDate = `${da}-${mo}-${ye}`
     const user = JSON.parse(localStorage.getItem('user'))?.user;
+    if (!user)
+        return ""
 
     let image = (transaction.party===null || transaction.party===undefined) ? "No Name" : transaction.party.slice(0,2)
     // NEW MODEL DEPENDING ON WHO DEBITS AND CREDITS

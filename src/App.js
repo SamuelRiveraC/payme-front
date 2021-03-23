@@ -45,23 +45,37 @@ function App() {
     const user = JSON.parse(localStorage.getItem('user'));
     return user
   }
+  let storageAccounts = JSON.parse(localStorage.getItem('BankAccounts'))  
+  let storageTransactions = JSON.parse(localStorage.getItem('Transactions'))  
+  let storageNotifications = JSON.parse(localStorage.getItem('Notifications')) 
+  
   const [user, setUser] = useState(getUser()) 
-  const [BankAccountsState, SetBankAccounts] = useState([]) 
-  const [TransactionsState, SetTransactions] = useState([]) 
-  const [NotificationsState, SetNotifications] = useState([]) 
+  const [BankAccountsState, SetBankAccounts] = useState(storageAccounts ? storageAccounts : []) 
+  const [TransactionsState, SetTransactions] = useState(storageTransactions ? storageTransactions : []) 
+  const [NotificationsState, SetNotifications] = useState(storageNotifications ? storageNotifications : []) 
+
+
+
+  
+  
 
   const handleLogin = user => {
     user.date = Date.now()
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
     refreshTokens()
+    handleReload()
     history.replace("/")
   }
   const handleLogout = () => {
-    axios.get(process.env.REACT_APP_API_URL+"logout", {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+    axios.get(process.env.REACT_APP_API_URL+"logout", 
+      {headers: { Authorization: `Bearer ${getUser()?.token}` }}
     ).then(({ data }) => {
-      localStorage.clear()
       setUser(undefined)
+      localStorage.clear('user')
+      localStorage.clear('BankAccounts')
+      localStorage.clear('Transactions')
+      localStorage.clear('Notifications')
       history.replace("/")
     })
   }
@@ -76,32 +90,39 @@ function App() {
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData.user) 
       }).catch((error) => {
-        console.error(error.response.data)
-        localStorage.clear()
-        history.replace("/login")
+        console.error(error.response.data) 
+        // localStorage.clear('user')
+        // localStorage.clear('BankAccounts')
+        // localStorage.clear('Transactions')
+        // localStorage.clear('Notifications')
+        // history.replace("/login")
       });
 
       axios.get( process.env.REACT_APP_API_URL+"fetch-banks/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
-        SetBankAccounts(response.data)
+        SetBankAccounts(response.data ?? [])
+        localStorage.setItem('BankAccounts', JSON.stringify(response.data));
       }).catch((error) => {
         console.warn(error.response)
       });
 
       axios.get( process.env.REACT_APP_API_URL+"fetch-transactions/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
-        SetTransactions(response.data)
+        SetTransactions(response.data ?? [])
+        localStorage.setItem('Transactions', JSON.stringify(response.data));
       }).catch((error) => {
         console.warn(error.response)
       });
 
       axios.get( process.env.REACT_APP_API_URL+"fetch-notifications/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
-        SetNotifications(response.data)
+        SetNotifications(response.data ?? [])
+        localStorage.setItem('Notifications', JSON.stringify(response.data));
       }).catch((error) => {
         console.warn(error.response)
       });
-
+    } else {
+      handleLogout()
     }
   }
 
@@ -130,7 +151,7 @@ function App() {
     
     const interval_data = setInterval(() => {
         handleReload()
-    }, 60000*1);
+    }, 60000*1); // Every 1 minute
     const interval_tokens = setInterval(() => {
         refreshTokens()
     }, 60000*5); // Every 5 minutes
@@ -224,8 +245,13 @@ function App() {
             <AddAccount />
           </Route>
 
-          <Route path="/" >
-            <Dashboard user={ user } BankAccounts={BankAccountsState} Transactions={TransactionsState} Notifications={NotificationsState}/>
+          <Route path="/">
+            <Dashboard user={ user } 
+              BankAccounts={BankAccountsState} 
+              Transactions={TransactionsState} 
+              Notifications={NotificationsState}
+              triggerRefresh={() => handleReload()}
+            />
           </Route>
         </Switch>
       </CSSTransition>

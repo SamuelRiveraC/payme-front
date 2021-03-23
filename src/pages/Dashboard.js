@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Transaction from '../components/Transaction';
 
-export default function Dashboard({user, BankAccounts, Transactions, Notifications}) {
+export default function Dashboard({user, BankAccounts, Transactions, Notifications, triggerRefresh}) {
 
   let balance = 0
   if (BankAccounts && Array.isArray(BankAccounts)) {
@@ -20,7 +20,7 @@ export default function Dashboard({user, BankAccounts, Transactions, Notificatio
 
       <div className="row dashboard">
 
-        <Header notification notificationNumber={Notifications.length} menu/>
+        <Header notification notificationNumber={Notifications.length} menu triggerRefresh={()=>triggerRefresh()}/>
         <div className="col-12 mobile_col text-center">
           { (balance || balance == 0) && <h1> <small>Available Balance</small> <br /> <b>{balance}€</b> <br /> <br /> </h1> }
 
