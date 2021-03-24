@@ -27,14 +27,18 @@ export default function ErrorScreen({error, tryAgain}) {
       <div className="row mobile_row">
 
         <div className="col-12 mobile_col text-center">
+          <br/>
+        </div>
+        <div className="col-12 mobile_col text-center">
           <h1 className="validation__error mb-5">
             { getError() } 
           </h1>
+        </div>
 
+        <div className="col-12 mobile_col text-center">
           <Link className="btn btn-outline-primary w-100 mt-5" to="/">
             Go to Main Menu
           </Link>
-
           {tryAgain && <button className="btn btn-outline-primary w-100 mt-5" onClick={()=>tryAgain()}>
             Try Again
           </button> }

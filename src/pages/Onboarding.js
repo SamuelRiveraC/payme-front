@@ -22,6 +22,9 @@ function Onboarding() {
 
     <div className="row mobile_row">
 
+      <div className="col-12 mobile_col text-center">
+      </div>
+
       <div className="col-12 mobile_col onboarding">
 
         <Slider {...settings}>
@@ -42,12 +45,7 @@ function Onboarding() {
             <img src={Money_transfer_2} alt="Logo" />
           </div>
         </Slider>
-          
       </div>
-
-
-  
-
 
       <div className="col-12 mobile_col text-center">
         <Link className="btn btn-light w-100 mb-3" to="/register">
