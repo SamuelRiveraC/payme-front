@@ -10,7 +10,6 @@ function Settings({logout, user}) {
 
   return <div className="container">
       <div className="row mobile_row">
-
         <Header back>
           <div className="profile">
             <img src={user.profile_picture} alt="profile" /> { `${user.first_name} ${user.last_name}` }

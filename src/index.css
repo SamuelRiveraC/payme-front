@@ -22,6 +22,7 @@ body {
 	color:#EDF4FC;
 	padding-bottom: 5em;
 	margin: 0;
+	margin-top: -2vh;
 } .dashboard svg, .dashboard a {
 	color: #EDF4FC;
 }
@@ -47,6 +48,7 @@ body {
 	min-height:100vh;
 	color: #29363D;
 	margin: auto;
+	padding-top:2vh;
 }
 
 
@@ -56,27 +58,24 @@ body {
 	background: transparent !important;
 	color: #EDF4FC !important;
 }
+
+ 
 .mobile_row {
 	flex-direction: column;
-	align-items: flex-end;
-	min-height:100vh;
-	/* 
+	min-height: 96vh;
 	justify-content: space-between;
-	align-items: center;
-	*/
 }
 
 .mobile_col {
 	width:100%;
 	max-width:450px;
-	margin: auto;
+	margin:0 auto;
 }
+
 
 .velocity-animating{
 	min-height:0;
 }
-
-
 
 .form-outline , .form-control, .form-check {
 	max-width:450px;
@@ -180,7 +179,7 @@ a {
 } .transactions ul {
 	list-style: none;
 	padding:0;
-	min-height: 40vh; 
+	min-height: 30vh; 
 } .transactions li {
 	margin-bottom: 1em;
 } .transactions .image img {

@@ -49,7 +49,7 @@ function App() {
   let storageTransactions = JSON.parse(localStorage.getItem('Transactions'))  
   let storageNotifications = JSON.parse(localStorage.getItem('Notifications')) 
   
-  const [user, setUser] = useState(getUser()) 
+  const [UserState, setUserState] = useState(getUser()?.user) 
   const [BankAccountsState, SetBankAccounts] = useState(storageAccounts ? storageAccounts : []) 
   const [TransactionsState, SetTransactions] = useState(storageTransactions ? storageTransactions : []) 
   const [NotificationsState, SetNotifications] = useState(storageNotifications ? storageNotifications : []) 
@@ -62,7 +62,7 @@ function App() {
   const handleLogin = user => {
     user.date = Date.now()
     localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
+    setUserState(user.user);
     refreshTokens()
     handleReload()
     history.replace("/")
@@ -71,7 +71,7 @@ function App() {
     axios.get(process.env.REACT_APP_API_URL+"logout", 
       {headers: { Authorization: `Bearer ${getUser()?.token}` }}
     ).then(({ data }) => {
-      setUser(undefined)
+      setUserState(undefined)
       localStorage.clear('user')
       localStorage.clear('BankAccounts')
       localStorage.clear('Transactions')
@@ -84,21 +84,26 @@ function App() {
   const handleReload = () => {
     if (getUser()?.token) {
       
-      axios.get( process.env.REACT_APP_API_URL+"auth/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      axios.get( process.env.REACT_APP_API_URL+"auth/",  
+        {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
         let userData = { token: getUser()?.token, user: response.data, date: Date.now() }
         localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData.user) 
+        setUserState(userData.user) 
       }).catch((error) => {
         console.error(error.response.data) 
-        // localStorage.clear('user')
-        // localStorage.clear('BankAccounts')
-        // localStorage.clear('Transactions')
-        // localStorage.clear('Notifications')
-        // history.replace("/login")
+        if (error.response.status === 401) {
+          setUserState(null)
+          localStorage.clear('user')
+          localStorage.clear('BankAccounts')
+          localStorage.clear('Transactions')
+          localStorage.clear('Notifications')
+          history.replace("/login")
+        }
       });
 
-      axios.get( process.env.REACT_APP_API_URL+"fetch-banks/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      axios.get( process.env.REACT_APP_API_URL+"fetch-banks/",
+        {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
         SetBankAccounts(response.data ?? [])
         localStorage.setItem('BankAccounts', JSON.stringify(response.data));
@@ -106,7 +111,8 @@ function App() {
         console.warn(error.response)
       });
 
-      axios.get( process.env.REACT_APP_API_URL+"fetch-transactions/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      axios.get( process.env.REACT_APP_API_URL+"fetch-transactions/",
+        {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
         SetTransactions(response.data ?? [])
         localStorage.setItem('Transactions', JSON.stringify(response.data));
@@ -114,7 +120,8 @@ function App() {
         console.warn(error.response)
       });
 
-      axios.get( process.env.REACT_APP_API_URL+"fetch-notifications/",  {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      axios.get( process.env.REACT_APP_API_URL+"fetch-notifications/",
+        {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
         SetNotifications(response.data ?? [])
         localStorage.setItem('Notifications', JSON.stringify(response.data));
@@ -128,7 +135,8 @@ function App() {
 
   const refreshTokens = () => {
     if (getUser()?.token) {
-      axios.get(process.env.REACT_APP_API_URL+"refresh-tokens", {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+      axios.get(process.env.REACT_APP_API_URL+"refresh-tokens", 
+        {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then(({ data }) => {
         console.log("Refreshed tokens")
       })
@@ -155,14 +163,15 @@ function App() {
     const interval_tokens = setInterval(() => {
         refreshTokens()
     }, 60000*5); // Every 5 minutes
-    return () => {clearInterval(interval_data);clearInterval(interval_tokens);  };
+    return () => {
+      clearInterval(interval_data);
+      clearInterval(interval_tokens);
+    };
   }, [location.pathname]);
-
 
   //console.log(!getUser() ? "No session" : "Session active", getUser().user, "-" , !user ? "No session" : "Session active" , user)
 
-
-  if (!user) {
+  if (!UserState) {
     return (
       <TransitionGroup>
         <CSSTransition key={location.key}  classNames="fade" timeout={300} >
@@ -183,41 +192,24 @@ function App() {
   }
 
   return (
-    <TransitionGroup user={ user }>
+    <TransitionGroup>
       <CSSTransition key={location.key}  classNames="fade" timeout={300} >
         <Switch location={location}>
   
-          <Route path="/notifications">
-            <NotificationsComponent Notifications={ NotificationsState }/>
-          </Route>
-          <Route path="/settings" >
-            <Settings logout={handleLogout} user={ user }/>
-          </Route>
-
-
-
-
-
-
 
           <Route path="/send-payment">
-             {/*<Send />*/}
             <TransactionControl transactionType="Send"/>
           </Route>
           <Route path="/request-payment">
-             {/*<Request />*/}
             <TransactionControl transactionType="Request"/>
           </Route>
           <Route path="/user/:userSlug">
-             {/*<LinkUser />*/}
             <TransactionControl transactionType="User"/>
           </Route>
           <Route path="/request/:transactionID">
-             {/*<LinkRequest />*/}
             <TransactionControl transactionType="Payment"/>
           </Route>
           <Route path="/complete-payment/:bank">
-             {/*<LinkRequest />*/}
             <TransactionCallback />
           </Route>
 
@@ -228,9 +220,15 @@ function App() {
 
 
 
+          <Route path="/notifications">
+            <NotificationsComponent Notifications={ NotificationsState }/>
+          </Route>
+          <Route path="/settings" >
+            <Settings logout={handleLogout} user={ UserState }/>
+          </Route>
           
           <Route path="/accounts">
-            <Accounts user={ user } BankAccounts={BankAccountsState}/>
+            <Accounts user={ UserState } BankAccounts={BankAccountsState}/>
           </Route>
           <Route path="/account/:id">
             <Account />
@@ -246,7 +244,7 @@ function App() {
           </Route>
 
           <Route path="/">
-            <Dashboard user={ user } 
+            <Dashboard user={ UserState } 
               BankAccounts={BankAccountsState} 
               Transactions={TransactionsState} 
               Notifications={NotificationsState}
