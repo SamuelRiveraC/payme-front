@@ -1,0 +1,8 @@
+{
+  "appId": "io.ionic.payme",
+  "appName": "payme",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "build",
+  "cordova": {}
+}

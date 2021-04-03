@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import QRCode from 'qrcode.react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import Placeholder from "../img/Placeholder.png"
 
 import Header from '../components/Header';
 
@@ -12,7 +13,7 @@ function Settings({logout, user}) {
       <div className="row mobile_row">
         <Header back>
           <div className="profile">
-            <img src={user.profile_picture} alt="profile" /> { `${user.first_name} ${user.last_name}` }
+            <img src={Placeholder} alt="profile" /> { `${user.first_name} ${user.last_name}` }
           </div>
         </Header>
 

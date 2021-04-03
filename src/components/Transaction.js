@@ -1,4 +1,5 @@
 import React from 'react'
+import Placeholder from "../img/Placeholder.png"
 
 export default function Transaction({transaction}) {
 
@@ -19,7 +20,7 @@ export default function Transaction({transaction}) {
     <li className="row"> 
         
         <div className="col-2 text-left image">
-            <img src={"https://via.placeholder.com/160/"+transaction.color+"/EDF4FC?text="+image} height={60} alt="transaction" />
+            <img src={Placeholder} height={60} alt="transaction" />
         </div>
         <div className="col-5 text-left information">
             <b> {(transaction.party===null || transaction.party===undefined) ? "No Name" : transaction.party} </b>
@@ -34,8 +35,8 @@ export default function Transaction({transaction}) {
 
     <li className="row">
     	<div className="col-2 text-left image">
-            {user.id === transaction.sender.id   && <img src={transaction.sender.profile_picture  } height={60} alt="transaction" />}
-            {user.id === transaction.receiver.id && <img src={transaction.receiver.profile_picture} height={60} alt="transaction" />}
+            {user.id === transaction.sender.id   && <img src={Placeholder} height={60} alt="transaction" />}
+            {user.id === transaction.receiver.id && <img src={Placeholder} height={60} alt="transaction" />}
     	</div>
     	<div className="col-5 text-left information">
             {user.id === transaction.sender.id   && <b> {transaction.receiver.first_name} {transaction.receiver.last_name} </b> }

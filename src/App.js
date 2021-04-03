@@ -195,8 +195,6 @@ function App() {
     <TransitionGroup>
       <CSSTransition key={location.key}  classNames="fade" timeout={300} >
         <Switch location={location}>
-  
-
           <Route path="/send-payment">
             <TransactionControl transactionType="Send"/>
           </Route>
