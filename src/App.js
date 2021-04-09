@@ -87,50 +87,57 @@ function App() {
       axios.get( process.env.REACT_APP_API_URL+"auth/",  
         {headers: { Authorization: `Bearer ${getUser()?.token}` }}
       ).then( (response) => {
+
         let userData = { token: getUser()?.token, user: response.data, date: Date.now() }
         localStorage.setItem('user', JSON.stringify(userData));
         setUserState(userData.user) 
+
+        axios.get( process.env.REACT_APP_API_URL+"fetch-banks/",
+          {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+        ).then( (response) => {
+          SetBankAccounts(response.data ?? [])
+          localStorage.setItem('BankAccounts', JSON.stringify(response.data));
+        }).catch((error) => {
+          console.warn(error.response)
+        });
+  
+        axios.get( process.env.REACT_APP_API_URL+"fetch-transactions/",
+          {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+        ).then( (response) => {
+          SetTransactions(response.data ?? [])
+          localStorage.setItem('Transactions', JSON.stringify(response.data));
+        }).catch((error) => {
+          console.warn(error.response)
+        });
+  
+        axios.get( process.env.REACT_APP_API_URL+"fetch-notifications/",
+          {headers: { Authorization: `Bearer ${getUser()?.token}` }}
+        ).then( (response) => {
+          SetNotifications(response.data ?? [])
+          localStorage.setItem('Notifications', JSON.stringify(response.data));
+        }).catch((error) => {
+          console.warn(error.response)
+        });
+
+
+
       }).catch((error) => {
-        console.error(error.response.data) 
-        if (error.response.status === 401) {
+        console.error(error) 
+        if (error?.response?.status === 401) {
           setUserState(null)
-          localStorage.clear('user')
-          localStorage.clear('BankAccounts')
-          localStorage.clear('Transactions')
-          localStorage.clear('Notifications')
+          localStorage.clear()
           history.replace("/login")
         }
       });
 
-      axios.get( process.env.REACT_APP_API_URL+"fetch-banks/",
-        {headers: { Authorization: `Bearer ${getUser()?.token}` }}
-      ).then( (response) => {
-        SetBankAccounts(response.data ?? [])
-        localStorage.setItem('BankAccounts', JSON.stringify(response.data));
-      }).catch((error) => {
-        console.warn(error.response)
-      });
+    } 
 
-      axios.get( process.env.REACT_APP_API_URL+"fetch-transactions/",
-        {headers: { Authorization: `Bearer ${getUser()?.token}` }}
-      ).then( (response) => {
-        SetTransactions(response.data ?? [])
-        localStorage.setItem('Transactions', JSON.stringify(response.data));
-      }).catch((error) => {
-        console.warn(error.response)
-      });
-
-      axios.get( process.env.REACT_APP_API_URL+"fetch-notifications/",
-        {headers: { Authorization: `Bearer ${getUser()?.token}` }}
-      ).then( (response) => {
-        SetNotifications(response.data ?? [])
-        localStorage.setItem('Notifications', JSON.stringify(response.data));
-      }).catch((error) => {
-        console.warn(error.response)
-      });
-    } else {
-      handleLogout()
+    else {
+      setUserState(null)
+      localStorage.clear()
+      history.replace("/login")
     }
+
   }
 
   const refreshTokens = () => {
@@ -174,6 +181,7 @@ function App() {
   if (!UserState) {
     return (
       <TransitionGroup>
+      <p> {JSON.stringify(UserState)} </p>
         <CSSTransition key={location.key}  classNames="fade" timeout={300} >
           <Switch location={location}>
             <Route path="/login">
@@ -193,6 +201,7 @@ function App() {
 
   return (
     <TransitionGroup>
+      <p> {JSON.stringify(UserState)} </p>
       <CSSTransition key={location.key}  classNames="fade" timeout={300} >
         <Switch location={location}>
           <Route path="/send-payment">
@@ -210,12 +219,6 @@ function App() {
           <Route path="/complete-payment/:bank">
             <TransactionCallback />
           </Route>
-
-
-
-
-
-
 
 
           <Route path="/notifications">

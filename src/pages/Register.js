@@ -21,7 +21,6 @@ export default function Register({ setToken }) {
   }
 
   const handleSubmit = async e => {
-    SetLoading(true)
     e.preventDefault();
     
     if (!password || !email || !phone || !first_name || !last_name || !tos) {
@@ -29,6 +28,8 @@ export default function Register({ setToken }) {
       turnOffValidation()
       return false;
     }
+    
+    SetLoading(true)
 
     axios.post(process.env.REACT_APP_API_URL+"users", { password, email, phone, first_name, last_name } )
     .then((response) => {

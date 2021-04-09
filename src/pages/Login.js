@@ -19,7 +19,6 @@ export default function Login({ setToken }) {
   }
 
   const handleSubmit = async e => {
-    SetLoading(true)
     e.preventDefault();
 
     if (!emailOrPhone || !password) {
@@ -28,6 +27,8 @@ export default function Login({ setToken }) {
       return false;
     }
 
+    SetLoading(true)
+    
     axios.post(process.env.REACT_APP_API_URL+"login", { emailOrPhone, password } )
     .then((response) => {
       setToken(response.data);
