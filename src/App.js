@@ -181,7 +181,6 @@ function App() {
   if (!UserState) {
     return (
       <TransitionGroup>
-      <p> {JSON.stringify(UserState)} </p>
         <CSSTransition key={location.key}  classNames="fade" timeout={300} >
           <Switch location={location}>
             <Route path="/login">
@@ -201,7 +200,6 @@ function App() {
 
   return (
     <TransitionGroup>
-      <p> {JSON.stringify(UserState)} </p>
       <CSSTransition key={location.key}  classNames="fade" timeout={300} >
         <Switch location={location}>
           <Route path="/send-payment">
